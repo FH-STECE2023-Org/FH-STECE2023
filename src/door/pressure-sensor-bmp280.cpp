@@ -1,141 +1,95 @@
 #include "pressure-sensor-bmp280.h"
-
-#include <iostream>
-#include <fcntl.h>
-#include <chrono>
 #include <thread>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <string>
-#include <cstring>
+#include <chrono>
+#include <stdexcept>
 
-#ifdef __linux__
-#include <linux/i2c-dev.h>
-#else
-// Mock I2C definitions for non-Linux platforms (e.g., macOS)
-#define I2C_SLAVE 0x0703
-#endif
+/*
+ * BMP280 register addresses
+ */
+#define BMP280_REG_CONTROL        0xF4
+#define BMP280_REG_CONFIG         0xF5
+#define BMP280_REG_PRESSURE_MSB   0xF7
+#define BMP280_REG_CALIB          0x88
 
-using namespace std;
+/*
+ * Constructor
+ * -----------
+ * Initializes the BMP280 sensor:
+ * 1. Opens I2C connection via I2C utility
+ * 2. Configures the sensor (oversampling, mode)
+ * 3. Reads calibration data from the sensor
+ */
+BMP280::BMP280(const std::string& device, uint8_t address)
+{
+    // Create I2C connection to BMP280
+    i2c_ = std::make_unique<I2C>(device, address);
 
-#define BMP280_REG_CONTROL 0xF4
-#define BMP280_REG_CONFIG  0xF5
-#define BMP280_REG_PRESSURE_MSB 0xF7
-#define BMP280_REG_CALIB 0x88
+    // Configure control register:
+    //  - Temperature and Pressure oversampling x1
+    //  - Normal mode
+    uint8_t ctrl[2] = {BMP280_REG_CONTROL, 0x27};
+    i2c_->write(ctrl, 2);
 
-BMP280::BMP280(const std::string& i2c_dev, unsigned int address) : _fd(-1) {
-#ifdef __linux__
-    _fd = open(i2c_dev.c_str(), O_RDWR);
-    if (_fd < 0) {
-        perror("Failed to open /dev/i2c-1");
-        throw runtime_error("Failed to open /dev/i2c-1");
-    }
+    // Configure config register:
+    //  - Standby 0.5ms
+    //  - Filter off
+    uint8_t cfg[2] = {BMP280_REG_CONFIG, 0x00};
+    i2c_->write(cfg, 2);
 
-    if (ioctl(_fd, I2C_SLAVE, address) < 0) {
-        close(_fd);
-        perror("Failed to acquire bus access and/or talk to slave");
-        throw runtime_error("Failed to acquire bus access and/or talk to slave");
-    }
-
-    // Write config
-    uint8_t config1[2] = {BMP280_REG_CONTROL, 0x27};  // Temp+Press oversampling x1, normal mode
-    uint8_t config2[2] = {BMP280_REG_CONFIG, 0x00};   // Standby 0.5ms, filter off
-
-    if (write(_fd, config1, 2) != 2) {
-        perror("Failed to write config1 to the i2c bus.");
-        close(_fd);
-        throw runtime_error("Failed to write config1 to the i2c bus.");
-    }
-
-    if (write(_fd, config2, 2) != 2) {
-        perror("Failed to write config2 to the i2c bus.");
-        close(_fd);
-        throw runtime_error("Failed to write config2 to the i2c bus.");
-    }
-
-    // sleep for 100ms to allow sensor to stabilize
-    this_thread::sleep_for(chrono::milliseconds(100));
+    // Wait 100ms for the sensor to stabilize
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // Read calibration data
-    uint8_t calib_reg = BMP280_REG_CALIB;
-    if (write(_fd, &calib_reg, 1) != 1) {
-        perror("Failed to write to the i2c bus.");
-        close(_fd);
-        throw runtime_error("Failed to write to the i2c bus.");
-    }
-    uint8_t calib_data[24];
-    if (read(_fd, calib_data, 24) != 24) {
-        perror("Failed to read from the i2c bus.");
-        close(_fd);
-        throw runtime_error("Failed to write to the i2c bus.");
+    i2c_->write_reg(BMP280_REG_CALIB); // Set pointer to calibration start
+    uint8_t calib[24];
+    if (i2c_->read(calib, 24) != 24) {
+        throw std::runtime_error("Failed to read BMP280 calibration data");
     }
 
-    // Unpack calibration data
-    _dig_T1 = (calib_data[1] << 8) | calib_data[0];
-    _dig_T2 = (calib_data[3] << 8) | calib_data[2];
-    _dig_T3 = (calib_data[5] << 8) | calib_data[4];
-    _dig_P1 = (calib_data[7] << 8) | calib_data[6];
-    _dig_P2 = (calib_data[9] << 8) | calib_data[8];
-    _dig_P3 = (calib_data[11] << 8) | calib_data[10];
-    _dig_P4 = (calib_data[13] << 8) | calib_data[12];
-    _dig_P5 = (calib_data[15] << 8) | calib_data[14];
-    _dig_P6 = (calib_data[17] << 8) | calib_data[16];
-    _dig_P7 = (calib_data[19] << 8) | calib_data[18];
-    _dig_P8 = (calib_data[21] << 8) | calib_data[20];
-    _dig_P9 = (calib_data[23] << 8) | calib_data[22];
-#else
-    // Non-Linux platform: Initialize with dummy calibration data
-    std::cerr << "BMP280: Running on non-Linux platform - sensor will not work" << std::endl;
-    _dig_T1 = 27504;
-    _dig_T2 = 26435;
-    _dig_T3 = -1000;
-    _dig_P1 = 36477;
-    _dig_P2 = -10685;
-    _dig_P3 = 3024;
-    _dig_P4 = 2855;
-    _dig_P5 = 140;
-    _dig_P6 = -7;
-    _dig_P7 = 15500;
-    _dig_P8 = -14600;
-    _dig_P9 = 6000;
-#endif
+    // Unpack calibration coefficients according to datasheet
+    _dig_T1 = (calib[1] << 8) | calib[0];
+    _dig_T2 = (calib[3] << 8) | calib[2];
+    _dig_T3 = (calib[5] << 8) | calib[4];
+    _dig_P1 = (calib[7] << 8) | calib[6];
+    _dig_P2 = (calib[9] << 8) | calib[8];
+    _dig_P3 = (calib[11] << 8) | calib[10];
+    _dig_P4 = (calib[13] << 8) | calib[12];
+    _dig_P5 = (calib[15] << 8) | calib[14];
+    _dig_P6 = (calib[17] << 8) | calib[16];
+    _dig_P7 = (calib[19] << 8) | calib[18];
+    _dig_P8 = (calib[21] << 8) | calib[20];
+    _dig_P9 = (calib[23] << 8) | calib[22];
 }
 
-BMP280::~BMP280() {
-    if (_fd >= 0) {
-        close(_fd);
-    }
-}
-
+/*
+ * get_value()
+ * -----------
+ * Reads raw pressure (and temperature for compensation) from the BMP280
+ * Applies Bosch datasheet compensation formulas
+ * Returns pressure in hPa
+ */
 float BMP280::get_value() const
 {
-#ifdef __linux__
-    // Read raw temperature and pressure
-    uint8_t press_reg = BMP280_REG_PRESSURE_MSB;
-    if (write(_fd, &press_reg, 1) != 1) {
-        perror("Failed to write to the i2c bus.");
-        throw runtime_error("Failed to write to the i2c bus.");
-    }
+    // Set pointer to pressure MSB register
+    i2c_->write_reg(BMP280_REG_PRESSURE_MSB);
+
+    // Read 6 bytes: pressure MSB, LSB, XLSB, temperature MSB, LSB, XLSB
     uint8_t raw_data[6];
-    if (read(_fd, raw_data, 6) != 6) {
-        perror("Failed to read from the i2c bus.");
-        close(_fd);
-        throw runtime_error("Failed to write to the i2c bus.");
+    if (i2c_->read(raw_data, 6) != 6) {
+        throw std::runtime_error("Failed to read BMP280 raw pressure and temperature");
     }
 
+    // Combine bytes to 20-bit raw values
     int32_t raw_pressure = (raw_data[0] << 12) | (raw_data[1] << 4) | (raw_data[2] >> 4);
-    int32_t raw_temp = (raw_data[3] << 12) | (raw_data[4] << 4) | (raw_data[5] >> 4);
+    int32_t raw_temp     = (raw_data[3] << 12) | (raw_data[4] << 4) | (raw_data[5] >> 4);
 
-    // Temperature compensation formulas according to datasheet
-    int32_t t_fine;
-    int32_t var1, var2;
+    // Temperature compensation (t_fine) according to datasheet
+    int32_t var1 = (((raw_temp >> 3) - ((int32_t)_dig_T1 << 1)) * ((int32_t)_dig_T2)) >> 11;
+    int32_t var2 = (((((raw_temp >> 4) - ((int32_t)_dig_T1)) *
+                      ((raw_temp >> 4) - ((int32_t)_dig_T1))) >> 12) * ((int32_t)_dig_T3)) >> 14;
+    int32_t t_fine = var1 + var2;
 
-    var1 = (((raw_temp >> 3) - ((int32_t)_dig_T1 << 1)) * ((int32_t)_dig_T2)) >> 11;
-    var2 = (((((raw_temp >> 4) - ((int32_t)_dig_T1)) * ((raw_temp >> 4) - ((int32_t)_dig_T1))) >> 12) * ((int32_t)_dig_T3)) >> 14;
-    t_fine = var1 + var2;
-
-    // Pressure compensation formula according to datasheet
-
+    // Pressure compensation according to datasheet
     int64_t p_var1, p_var2, p;
     p_var1 = ((int64_t)t_fine) - 128000;
     p_var2 = p_var1 * p_var1 * (int64_t)_dig_P6;
@@ -151,12 +105,8 @@ float BMP280::get_value() const
         p_var1 = (((int64_t)_dig_P9) * (p >> 13) * (p >> 13)) >> 25;
         p_var2 = (((int64_t)_dig_P8) * p) >> 19;
         p = ((p + p_var1 + p_var2) >> 8) + (((int64_t)_dig_P7) << 4);
-        pressure = (double)p / 256.0 / 100.0;
+        pressure = (double)p / 256.0 / 100.0; // Convert to hPa
     }
 
-    return pressure;
-#else
-    // Non-Linux platform: Return dummy pressure value
-    return 1013.25; // Standard atmospheric pressure in hPa
-#endif
+    return static_cast<float>(pressure);
 }
