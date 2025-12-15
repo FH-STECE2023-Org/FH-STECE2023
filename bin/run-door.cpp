@@ -13,8 +13,9 @@
 #include <door/output-switch.h>
 
 #include <door/input-switch-gpio-sysfs.h>
+#include <door/output-switch-gpio-sysfs.h>
 #include <door/pressure-sensor-bmp280.h>
-//#include <door/motor-stepper.h>
+#include <door/motor-stepper.h>
 
 #include <string>
 #include <iostream>
@@ -100,6 +101,9 @@ int main(int argc, char** argv)
     AnalogSensor* pressureSensor;
     Motor* motor;
 
+    OutputSwitchGPIOSysfs forwardSwitch(26+512);
+    OutputSwitchGPIOSysfs backwardSwitch(17+512);
+
     if (test)
     {
         // Mock sensors
@@ -120,15 +124,15 @@ int main(int argc, char** argv)
     {
         std::cout << "Info: Real run, using real sensors." << std::endl;
         // create sensors
-        button_outside = new InputSwitchGPIOSysfs(17);
-        button_inside = new InputSwitchGPIOSysfs(27);
-        lightbarrier_closed  = new InputSwitchGPIOSysfs(22);
-        lightbarrier_open  = new InputSwitchGPIOSysfs(23);
+        button_outside = new InputSwitchGPIOSysfs(17+512);
+        button_inside = new InputSwitchGPIOSysfs(27+512);
+        lightbarrier_closed  = new InputSwitchGPIOSysfs(22+512);
+        lightbarrier_open  = new InputSwitchGPIOSysfs(23+512);
 
         // Pressure Sensor
         pressureSensor = new BMP280("/dev/i2c-1", 0x76); 
 
-        //motor = new MotorStepper("/dev/gpiochip0", 26, 17, "2000000", "1000000");
+        motor = new MotorStepper("/dev/gpiochip0", forwardSwitch, backwardSwitch, "2000000", "1000000");
     }
 
     // Pressure Sensor Event Generator
