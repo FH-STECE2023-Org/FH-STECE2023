@@ -3,7 +3,7 @@
 #include "eventloop.h"
 #include <string>
 
-class InputEdgeEvent : public InputHandler
+class InputEdgeEvent : public PriorityHandler
 {
 public:
     // edge: "rising", "falling", "both"

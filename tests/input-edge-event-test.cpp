@@ -1,72 +1,51 @@
 #include <door/input_output_switch/input/input-edge-event.h>
 #include <door/utilities/eventloop.h>
-#include <iostream>
 
-// Test: GPIO Rising Edge Event Detection
-// This test creates an InputEdgeEvent on a specified pin and listens for rising edges.
-// When an edge is detected, the event loop receives GpioEdgeEvent.
+#include <chrono>
+#include <ctime>
+#include <exception>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 int main()
 {
     try {
-        // Configure GPIO pin (adjust pin number for your hardware)
-        constexpr int GPIO_PIN = 529;  // Change to your actual GPIO pin
-        constexpr int MAX_EVENTS = 5;  // Quit after receiving this many events
-        
-        int event_count = 0;
+        // Adjust for your hardware
+        constexpr int GPIO_PIN = 17+512;
+        constexpr int MIN_EVENTS = 5;
 
-        std::cout << "InputEdgeEvent Test: Rising Edge Detection on GPIO " << GPIO_PIN << std::endl;
-        std::cout << "Waiting for " << MAX_EVENTS << " rising edge events..." << std::endl;
+        // edge: "rising", "falling", "both"
+        const std::string edge = "rising";
 
-        // Create InputEdgeEvent for rising edge, returning GpioEdgeEvent
-        InputEdgeEvent gpio_input(GPIO_PIN, "rising", EventAction::GpioEdgeEvent);
+        std::cout << "Waiting for GPIO edge on pin " << GPIO_PIN << " (" << edge << ")..." << std::endl;
 
-        // Custom handler that counts events and quits after MAX_EVENTS
-        class TestHandler : public InputHandler
-        {
-        public:
-            TestHandler(InputEdgeEvent& input, int& count, int max)
-                : _input(input), _count(count), _max(max) {}
-
-            EventAction ready(int fd) override
-            {
-                // Let the InputEdgeEvent handle the lseek to clear interrupt
-                EventAction result = _input.ready(fd);
-                
-                if (result == EventAction::GpioEdgeEvent) {
-                    _count++;
-                    std::cout << "Rising edge detected on pin " << _input.pin() 
-                              << " (event " << _count << "/" << _max << ")" << std::endl;
-                    
-                    if (_count >= _max) {
-                        std::cout << "Test complete: Received " << _count << " events" << std::endl;
-                        return EventAction::Quit;
-                    }
-                }
-                return EventAction::Continue;
-            }
-
-        private:
-            InputEdgeEvent& _input;
-            int& _count;
-            int _max;
-        };
-
+        // Keep the event loop running; we'll count events in main()
+        InputEdgeEvent gpio_event(GPIO_PIN, edge, EventAction::Continue);
         Eventloop loop;
-        TestHandler handler(gpio_input, event_count, MAX_EVENTS);
-        
-        // Register directly with fd from InputEdgeEvent
-        // Note: We need access to the fd, so we'll use hookup but replace with our handler
-        gpio_input.hookup(loop);
+        gpio_event.hookup(loop);
 
-        std::cout << "Event loop started. Trigger rising edges on GPIO " << GPIO_PIN << "..." << std::endl;
-        loop.run();
+        for (int count = 1; count <= MIN_EVENTS; ++count) {
+            loop.run_one();
 
-        std::cout << "Test passed: " << event_count << " GpioEdgeEvent(s) received." << std::endl;
+            const auto now = std::chrono::system_clock::now();
+            const std::time_t t = std::chrono::system_clock::to_time_t(now);
+
+            std::tm tm{};
+#if defined(_WIN32)
+            localtime_s(&tm, &t);
+#else
+            localtime_r(&t, &tm);
+#endif
+
+            std::ostringstream ts;
+            ts << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+            std::cout << ts.str() << " event received " << count << std::endl;
+        }
         return 0;
-
     } catch (const std::exception& e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << "\n";
         return 1;
     }
 }
