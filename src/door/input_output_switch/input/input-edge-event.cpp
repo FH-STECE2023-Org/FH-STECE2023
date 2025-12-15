@@ -61,6 +61,8 @@ void InputEdgeEvent::hookup(Eventloop& loop)
 
 EventAction InputEdgeEvent::ready(int fd)
 {
+    //Todo: Find a way to decouple event for EventLoop and events for "door" 
+    //Implement a interface that abstracts the Event here to for the door logic (probably connects to inputsclass)?
     // REQUIRED: Seek to start to clear interrupt flag in sysfs
     lseek(fd, 0, SEEK_SET);
     return _event;
