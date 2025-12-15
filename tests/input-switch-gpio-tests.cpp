@@ -1,4 +1,4 @@
-#include <door/input-switch-gpio-sysfs.h>
+#include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -13,7 +13,7 @@ int main() {
         std::cout << "Reading GPIO line " << input_line << " on " << std::endl;
 
         // Read and print state 10 times (1s interval)
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; ; ++i) {
             InputSwitch::State state = inputswitch.get_state();
             if (state == InputSwitch::State::INPUT_HIGH)
                 std::cout << "State: INPUT HIGH\n";

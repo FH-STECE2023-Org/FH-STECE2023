@@ -2,7 +2,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include <time.h>
-#include <door/input-switch-mock.h>
+#include <door/input_output_switch/input/input-switch-mock.h>
 #include <door/event-edge-detector.h>
 
 TEST(eventedge_suite, rising_edge)

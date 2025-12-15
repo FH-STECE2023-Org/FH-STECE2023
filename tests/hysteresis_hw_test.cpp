@@ -1,6 +1,6 @@
 #include <cstdio>
-#include <door/pressure-sensor-bmp280.h>
-#include <door/analog-sensor-event-generator.h>
+#include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
 #include <thread>
 #include <chrono>
 

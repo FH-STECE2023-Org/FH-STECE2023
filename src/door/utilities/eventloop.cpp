@@ -38,12 +38,14 @@ EventAction Eventloop::run_one()
             elem->second |= POLLPRI;
     }
 
-    std::vector<struct pollfd> watches(collected.size());
-    for (auto [fd, flags]: collected)
+    std::vector<struct pollfd> watches;
+    watches.reserve(collected.size());
+    for (auto [fd, flags]: collected) {
         watches.push_back({
-                .fd = fd,
-                .events = flags,
-            });
+            .fd = fd,
+            .events = flags,
+        });
+    }
 
     int nready = poll(&watches[0], watches.size(), -1);
     if (nready == -1)

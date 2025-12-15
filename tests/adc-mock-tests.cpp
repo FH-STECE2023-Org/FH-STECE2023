@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <door/analog-sensor-mock.h>
+#include <door/analog_stuff/sensor/analog-sensor-mock.h>
 
 TEST(Adc_mock_suite, Adc_test)
 {

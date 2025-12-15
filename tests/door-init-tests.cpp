@@ -1,5 +1,5 @@
 #include <door/door.h>
-#include <door/input-switch.h>
+#include <input-switch.h>
 #include <gtest/gtest.h>
 #include <stdbool.h>
 #include <stdlib.h>

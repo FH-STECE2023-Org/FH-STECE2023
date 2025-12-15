@@ -1,6 +1,6 @@
-#include <door/outputs.h>
+#include <door/input_output_switch/output/outputs.h>
 #include <door/door.h>
-#include <door/motor-mock.h>
+#include <door/motor/motor-mock.h>
 #include <gtest/gtest.h>
 #include <stdbool.h>
 

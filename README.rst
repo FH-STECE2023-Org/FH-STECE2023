@@ -1,4 +1,4 @@
-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Developer Documentation
+Documentation
 =======================
 
 .. contents::
@@ -16,7 +16,7 @@ Optional: Install ``libgpiod``
 ``libgpiod`` is used to control GPIO pins. It can be left uninstalled
 for development purposes - if you develop code that can mock-away
 GPIOs then you can omit this step. If you choose to not install it,
-then you will have to live with a number of warnings in our project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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
+then you will have to live with a number of warnings in our project
 though.
 
 ``libgpiod`` installation has to be done manually, from

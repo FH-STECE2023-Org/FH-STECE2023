@@ -1,5 +1,5 @@
-#include <door/input-switch-gpio-sysfs.h>
-#include <door/output-switch-gpio-sysfs.h>
+#include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
+#include <door/input_output_switch/output/output-switch-gpio-sysfs.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 

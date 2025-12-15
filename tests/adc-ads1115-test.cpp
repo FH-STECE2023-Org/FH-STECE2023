@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <door/adc-ads1115.h>
+#include <door/analog_stuff/adc/adc-ads1115.h>
 #include <memory>
 #include <stdexcept>
 

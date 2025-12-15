@@ -1,5 +1,5 @@
 #pragma once
-#include "structs.h"
+#include "door/structs.h"
 #include "motor.h"
 #include "stdbool.h"
 
