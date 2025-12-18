@@ -19,7 +19,7 @@ target_link_libraries(
 target_include_directories(
     motor
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/.. 
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_include_directories(
@@ -27,4 +27,3 @@ target_include_directories(
     INTERFACE 
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
-

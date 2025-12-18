@@ -1,8 +1,8 @@
 #pragma once
 
-#include "door/structs.h"
-#include "door/utilities/timespec.h"
-#include "analog-sensor-event-generator.h"
+#include "structs.h"
+#include <door/utilities/timespec.h>
+#include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
 
 
 class Inputs

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "analog-sensor.h"
-#include "i2c.h"
+#include <door/analog_stuff/sensor/analog-sensor.h>
+#include <door/utilities/i2c.h>
 #include <memory>
 
 

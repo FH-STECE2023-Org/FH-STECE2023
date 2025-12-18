@@ -1,11 +1,11 @@
 #pragma once
 
 #include <sys/timerfd.h>
-#include "input_output_switch/input/inputs.h"
+#include "inputs.h"
 #include "outputs.h"
 #include "door.h"
 #include "structs.h"
-#include "utilities/timer-expired.h"
+#include <door/utilities/timer-expired.h>
 
 class PollingTimer : public TimerExpired
 {

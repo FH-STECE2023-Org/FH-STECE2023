@@ -8,9 +8,7 @@ add_library(
 target_include_directories(
     adc
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sensor
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../.. 
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_include_directories(
