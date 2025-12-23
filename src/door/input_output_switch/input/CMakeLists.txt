@@ -8,18 +8,12 @@ add_library(
     input-switch-mock.cpp
     input-switch-mock.h
     input-switch.h
-    inputs.cpp
-    inputs.h   
 )
 
 target_include_directories(
     input
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../..
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../motor
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../..
-
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_include_directories(
@@ -30,7 +24,6 @@ target_include_directories(
 
 target_link_libraries(
     input
-    PRIVATE door
     PRIVATE utilities
     PRIVATE motor
     PRIVATE analog_stuff

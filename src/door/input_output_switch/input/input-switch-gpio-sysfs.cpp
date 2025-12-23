@@ -8,7 +8,7 @@
 #include <string>
 
 #include "input-switch-gpio-sysfs.h"
-#include "small_file_handling.h"
+#include <door/utilities/small_file_handling.h>
 
 InputSwitchGPIOSysfs::InputSwitchGPIOSysfs(unsigned int line_number){
     _line_number = line_number;

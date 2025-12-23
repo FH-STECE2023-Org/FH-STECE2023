@@ -18,9 +18,7 @@ target_link_libraries(
 target_include_directories(
     sensor
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../adc 
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/../.. 
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_include_directories(

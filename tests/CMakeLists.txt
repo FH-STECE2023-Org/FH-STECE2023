@@ -15,11 +15,16 @@ add_executable(
 
   adc-mock-tests.cpp
 )
+target_include_directories(
+  door-tests
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   door-tests
 
   PRIVATE
-  door
+  statemachine
   utilities
   gtest_main
 
@@ -36,25 +41,35 @@ add_executable(
   motor-tests   
   motor-tests.cpp
 )
+target_include_directories(
+  motor-tests
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   motor-tests
-  door                
+  statemachine                
 )
 
 # add_executable(motorLED-tests motorLED-tests.cpp)
 # target_link_libraries(
 #   motorLED-tests
-#   door
+#   statemachine
 #   gtest_main
 # )
 
 add_executable(
   input-switch-gpio-tests input-switch-gpio-tests.cpp
 )
+target_include_directories(
+  input-switch-gpio-tests
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   input-switch-gpio-tests
 
-  door
+  statemachine
   gtest_main
 )
 
@@ -62,7 +77,7 @@ target_link_libraries(
 # target_link_libraries(
 #   motor-stepper-tests
 
-#   door
+#   statemachine
 #   gtest_main
 # )
 
@@ -71,9 +86,14 @@ add_executable(
   input-output-switch-gpio-sysfs-tests
   input-output-switch-gpio-sysfs-tests.cpp
 )
+target_include_directories(
+  input-output-switch-gpio-sysfs-tests
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   input-output-switch-gpio-sysfs-tests
-  door
+  statemachine
   gtest_main
 )
 add_test(
@@ -86,33 +106,54 @@ add_executable(adc_ads1115_test adc-ads1115-test.cpp)
 add_executable(hysteresis_hw_test hysteresis_hw_test.cpp)
 add_executable(input-edge-event-test input-edge-event-test.cpp)
 
+target_include_directories(
+  bmp280_test
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   bmp280_test
 
   PRIVATE
-  door
+  statemachine
   gtest_main
+)
+
+target_include_directories(
+  adc_ads1115_test
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
 )
 target_link_libraries(
   adc_ads1115_test
 
   PRIVATE
-  door
+  statemachine
   gtest_main
 )
 
+target_include_directories(
+  hysteresis_hw_test
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   hysteresis_hw_test
 
   PRIVATE
-  door
+  statemachine
 )
 
+target_include_directories(
+  input-edge-event-test
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/src
+)
 target_link_libraries(
   input-edge-event-test
 
   PRIVATE
-  door
+  statemachine
   utilities
 )
 

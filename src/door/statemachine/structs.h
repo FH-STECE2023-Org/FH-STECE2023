@@ -1,9 +1,9 @@
 #pragma once
 
-#include "input-switch.h"
-#include "event-edge-detector.h"
-#include "motor.h"
-#include "analog-sensor-event-generator.h"
+#include <door/input_output_switch/input/input-switch.h>
+#include <door/utilities/event-edge-detector.h>
+#include <door/motor/motor.h>
+#include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
 
 typedef struct input
 {

@@ -1,5 +1,5 @@
 #include "outputs.h"
-#include "motor.h"
+#include <door/motor/motor.h>
 
 Outputs::Outputs(Motor* motor)
 {

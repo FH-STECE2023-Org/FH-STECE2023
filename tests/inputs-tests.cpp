@@ -1,14 +1,13 @@
 #include <gtest/gtest.h>
 #include <stdbool.h>
 
-#include <door/door.h> 
-#include <door/structs.h> 
+#include <door/statemachine/door.h>
+#include <door/statemachine/structs.h>
+#include <door/statemachine/inputs.h>
 
-
-#include <door/input_output_switch/input/inputs.h>
 #include <door/input_output_switch/input/input-switch-mock.h>
 
-#include <door/event-edge-detector.h>
+#include <door/utilities/event-edge-detector.h>
 
 #include <door/analog_stuff/sensor/analog-sensor-mock.h>
 #include <door/analog_stuff/sensor/analog-sensor-event-generator.h>

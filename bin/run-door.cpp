@@ -1,12 +1,12 @@
-#include <door/door.h>
-#include <door/structs.h>
+#include <door/statemachine/door.h>
+#include <door/statemachine/structs.h>
 
-#include <door/input_output_switch/input/inputs.h>
+#include <door/statemachine/inputs.h>
+#include <door/statemachine/outputs.h>
+
 #include <door/input_output_switch/input/input-switch.h>
 #include <door/input_output_switch/input/input-switch-mock.h>
 #include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
-
-#include <door/input_output_switch/output/outputs.h>
 #include <door/input_output_switch/output/output-switch.h>
 
 #include <door/analog_stuff/sensor/analog-sensor.h>

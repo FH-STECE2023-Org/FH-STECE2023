@@ -1,7 +1,7 @@
 #pragma once
 
 #include "motor.h"
-#include "output-switch.h" // Einbinden der neuen Abstraktion
+#include <door/input_output_switch/output/output-switch.h> // Einbinden der neuen Abstraktion
 
 class MotorLED : public Motor
 {
