@@ -43,13 +43,14 @@ output_t Door::cyclic(const events_t events)
             {
                 _state = State::OPENING;
             }
-                 
+    
             // Gumminudel is broken
             if (events.analog_state == AnalogSensorEvent::UNDER_VALUE)
             {
                 _state = State::ERROR_SOMETHING_BADLY_WRONG;
             }
-            break; 
+
+            break;
 
         case State::OPENING:
 

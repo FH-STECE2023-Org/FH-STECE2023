@@ -4,8 +4,6 @@ add_library(
     door.h
     door.cpp
     structs.h
-    polling-timer.h
-    polling-timer.cpp
     inputs.h
     inputs.cpp
     outputs.h

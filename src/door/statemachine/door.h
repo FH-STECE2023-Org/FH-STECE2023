@@ -21,8 +21,8 @@ public:
     
     // void check(const Events& events);
     output_t init(const input_t input);
-    
-    
+
+
     output_t cyclic(const events_t event); // ???
 
 

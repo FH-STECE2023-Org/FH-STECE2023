@@ -1,5 +1,6 @@
 #include <door/statemachine/door.h>
 #include <door/statemachine/structs.h>
+
 #include <door/statemachine/inputs.h>
 #include <door/statemachine/outputs.h>
 
@@ -16,14 +17,15 @@
 #include <door/motor/motor-mock.h>
 
 #include <door/utilities/timespec.h>
-#include <door/utilities/eventloop.h>
-#include <door/utilities/periodic-timer.h>
-
-#include <door/utilities/timespec.h>
 
 #include <string>
 #include <iostream>
 #include <signal.h>
+
+#include <door/utilities/eventloop.h>
+#include <door/utilities/periodic-timer.h>
+
+#include <door/utilities/timespec.h>
 
 // quit flag with atomic type
 static volatile sig_atomic_t quit = 0;
@@ -161,13 +163,14 @@ int main(int argc, char** argv)
 
     //Eventloop
     Eventloop loop;
+
     PeriodicTimer timer_handler(set_time,
-                            [&inputs, &outputs, &door]()
-                            {
-                                events_t ev  = inputs.get_events();
-                                output_t out = door.cyclic(ev);
-                                outputs.set_outputs(out);
-                            });
+                                [&inputs, &outputs, &door]()
+                                {
+                                    events_t ev  = inputs.get_events();
+                                    output_t out = door.cyclic(ev);
+                                    outputs.set_outputs(out);
+                                });
 
     timer_handler.hookup(loop);
     loop.run();

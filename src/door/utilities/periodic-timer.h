@@ -15,7 +15,6 @@ public:
     EventAction ready(int fd) override;
 
 private:
-    int _timer_fd;    
+    int _timer_fd;
     std::function<void()> _expired;
-    TimerExpired* _timer;
 };

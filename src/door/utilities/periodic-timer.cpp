@@ -2,9 +2,9 @@
 
 #include <unistd.h>
 #include <assert.h>
-
-
-#include <format>
+#include <string.h>
+#include <stdexcept>
+//#include <format>
 #include <stdint.h>
 
 PeriodicTimer::PeriodicTimer(TimeSpec set_time, std::function<void()> expired) 
@@ -40,7 +40,7 @@ EventAction PeriodicTimer::ready(int fd)
         if (n != sizeof(expirations)) {
             return EventAction::Continue;  
         }
-        expired();
+        _expired();
 
         return EventAction::Continue;
     }
