@@ -16,10 +16,15 @@
 
 #include <door/motor/motor-mock.h>
 
+#include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
+#include <door/input_output_switch/output/output-switch-gpio-sysfs.h>
+#include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/motor/motor-stepper.h>
 #include <door/utilities/timespec.h>
 
 #include <string>
 #include <iostream>
+#include <memory>
 #include <signal.h>
 
 #include <door/utilities/eventloop.h>
@@ -107,6 +112,29 @@ int main(int argc, char** argv)
     AnalogSensor* pressureSensor;
     Motor* motor;
 
+    unsigned int OFFSET_GPIO = 512;
+
+    // Button
+    unsigned int Button_outside_line = 18 + OFFSET_GPIO;
+    unsigned int Button_inside_line = 27 + OFFSET_GPIO;
+
+    // Lightbarrier GPIO lines
+    unsigned int Lightbarrier_closed_line = 22 + OFFSET_GPIO;
+    unsigned int Lightbarrier_open_line = 23 + OFFSET_GPIO;
+
+
+    // Pressure Sensor GPIO lines
+    std::string             PressureSensor_Device = "/dev/i2c-1";
+    uint8_t                 PressureSensor_Adress = 0x76;
+    
+    // Motor stepper GPIO lines
+    std::string             Motor_Device = "/dev/gpiochip0";
+    std::string             Motor_T_Period = "2000000";
+    std::string             Motor_T_Duty = "1000000";
+
+    std::unique_ptr<OutputSwitchGPIOSysfs> motor_forward_switch;
+    std::unique_ptr<OutputSwitchGPIOSysfs> motor_backward_switch;
+    
     if (test)
     {
         // Mock sensors
@@ -127,15 +155,17 @@ int main(int argc, char** argv)
     {
         std::cout << "Info: Real run, using real sensors." << std::endl;
         // create sensors
-        button_outside = new InputSwitchGPIOSysfs(17);
-        button_inside = new InputSwitchGPIOSysfs(27);
-        lightbarrier_closed  = new InputSwitchGPIOSysfs(22);
-        lightbarrier_open  = new InputSwitchGPIOSysfs(23);
+        button_outside      = new InputSwitchGPIOSysfs(Button_outside_line);
+        button_inside       = new InputSwitchGPIOSysfs(Button_inside_line);
+        lightbarrier_closed = new InputSwitchGPIOSysfs(Lightbarrier_closed_line);
+        lightbarrier_open   = new InputSwitchGPIOSysfs(Lightbarrier_open_line);
 
         // Pressure Sensor
-        pressureSensor = new BMP280("/dev/i2c-1", 0x76); 
+        pressureSensor      = new BMP280(PressureSensor_Device, PressureSensor_Adress);
 
-        //motor = new MotorStepper("/dev/gpiochip0", 26, 17, "2000000", "1000000");
+        motor_forward_switch = std::make_unique<OutputSwitchGPIOSysfs>(26 + OFFSET_GPIO);
+        motor_backward_switch = std::make_unique<OutputSwitchGPIOSysfs>(17 + OFFSET_GPIO);
+        motor               = new MotorStepper(Motor_Device, *motor_forward_switch, *motor_backward_switch, Motor_T_Period, Motor_T_Duty);
     }
 
     // Pressure Sensor Event Generator
