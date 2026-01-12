@@ -24,6 +24,7 @@
 
 #include <door/utilities/eventloop.h>
 #include <door/utilities/periodic-timer.h>
+#include <door/utilities/graceful-term.h>
 
 #include <door/utilities/timespec.h>
 
@@ -171,7 +172,8 @@ int main(int argc, char** argv)
                                     output_t out = door.cyclic(ev);
                                     outputs.set_outputs(out);
                                 });
-
+    GracefulTerminator terminator;
+    terminator.hookup(loop);
     timer_handler.hookup(loop);
     loop.run();
 

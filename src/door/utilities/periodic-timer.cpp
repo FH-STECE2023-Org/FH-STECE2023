@@ -25,6 +25,12 @@ PeriodicTimer::PeriodicTimer(TimeSpec set_time, std::function<void()> expired)
     }
 }
 
+PeriodicTimer::~PeriodicTimer()
+{
+    if (_timer_fd != -1)
+        close(_timer_fd);
+}
+
 void PeriodicTimer::hookup(Eventloop& loop)
 {
     loop.register_input(_timer_fd, this);

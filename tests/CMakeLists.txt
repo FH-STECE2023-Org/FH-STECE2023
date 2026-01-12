@@ -7,6 +7,7 @@ add_executable(
 
   timespec-tests.cpp
   eventloop-tests.cpp
+  timer_test.cpp
   
   event-edge-detector-tests.cpp
 

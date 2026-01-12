@@ -7,6 +7,10 @@ add_library(
     eventloop.cpp
     periodic-timer.cpp
     periodic-timer.h
+    one-shot-timer.cpp
+    one-shot-timer.h
+    graceful-term.cpp
+    graceful-term.h
     i2c.h
     i2c.cpp
     event-edge-detector.h
