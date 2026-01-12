@@ -16,10 +16,10 @@
 
 #include <door/motor/motor-mock.h>
 
-#include <door/input-switch-gpio-sysfs.h>
-#include <door/output-switch-gpio-sysfs.h>
-#include <door/pressure-sensor-bmp280.h>
-#include <door/motor-stepper.h>
+#include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
+#include <door/input_output_switch/output/output-switch-gpio-sysfs.h>
+#include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/motor/motor-stepper.h>
 #include <door/utilities/timespec.h>
 
 #include <string>
