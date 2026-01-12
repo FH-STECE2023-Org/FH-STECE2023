@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <string.h>
 #include <stdexcept>
-#include <format>
 #include <stdint.h>
 
 PeriodicTimer::PeriodicTimer(TimeSpec set_time, std::function<void()> expired) 
