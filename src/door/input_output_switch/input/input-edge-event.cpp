@@ -1,6 +1,6 @@
 #include "input-edge-event.h"
 
-#include "small_file_handling.h"
+#include <door/utilities/small_file_handling.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -68,5 +68,8 @@ EventAction InputEdgeEvent::ready(int fd)
     lseek(fd, 0, SEEK_SET);
     char buf[8];
     (void)read(fd, buf, sizeof(buf));
-    return _event;
+
+    // ???
+
+    return _event; // Continue
 }

@@ -1,6 +1,6 @@
 #include "inputs.h"
-#include "event-edge-detector.h"
-#include "analog-sensor-event-generator.h"
+#include <door/utilities/event-edge-detector.h>
+#include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
 
 
 Inputs::Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* lightbarrier_closed, InputSwitch* lightbarrier_open, AnalogSensorEventGenerator* analogsensor, const TimeSpec& debounce_time)

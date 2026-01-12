@@ -2,8 +2,7 @@
 #include <fstream>
 #include <string>
 #include <unistd.h> // for usleep
-#include "small_file_handling.h"
-
+#include <door/utilities/small_file_handling.h>
 
 OutputSwitchGPIOSysfs::OutputSwitchGPIOSysfs(unsigned int line_number)
     : _line_number(line_number)
