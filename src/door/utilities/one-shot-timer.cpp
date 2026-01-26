@@ -1,4 +1,4 @@
-#include "periodic-timer.h"
+#include "one-shot-timer.h"
 
 #include <unistd.h>
 #include <assert.h>
@@ -6,37 +6,63 @@
 #include <stdexcept>
 #include <stdint.h>
 
-PeriodicTimer::PeriodicTimer(TimeSpec set_time, std::function<void()> expired) 
-: _expired(expired)
+OneShotTimer::OneShotTimer(TimeSpec set_time, std::function<void()> expired) 
+: _expired(expired), _time(set_time)
 {
+    _running = false;
     _timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     if (_timer_fd == -1) {
         perror("timerfd_create");
         throw std::runtime_error("timerfd_create failed");
     }
+}
+
+OneShotTimer::~OneShotTimer()
+{
+    assert(!_running);
+
+    if (_timer_fd != -1)
+        close(_timer_fd);
+}
+
+void OneShotTimer::stop()
+{
     itimerspec spec{
-        .it_interval = {set_time.tv_sec, set_time.tv_nsec},   // periodic: every 1ms
-        .it_value    = {0, 1},   //almost immediate expire
+        .it_interval = {0, 0},
+        .it_value    = {0, 0}, 
     };
 
     if (timerfd_settime(_timer_fd, 0, &spec, nullptr) == -1) {
         perror("timerfd_settime");
         throw std::runtime_error("timerfd_settime failed");
     }
+    else { 
+        _running = false; 
+    }
 }
 
-PeriodicTimer::~PeriodicTimer()
+void OneShotTimer::start()
 {
-    if (_timer_fd != -1)
-        close(_timer_fd);
+    itimerspec spec{
+        .it_interval = {0, 0},
+        .it_value    = {_time.tv_sec, _time.tv_nsec},   // One-Shot
+    };
+
+    if (timerfd_settime(_timer_fd, 0, &spec, nullptr) == -1) {
+        perror("timerfd_settime");
+        throw std::runtime_error("timerfd_settime failed");
+    }
+    else { 
+        _running = true; 
+    }
 }
 
-void PeriodicTimer::hookup(Eventloop& loop)
+void OneShotTimer::hookup(Eventloop& loop)
 {
     loop.register_input(_timer_fd, this);
 }
 
-EventAction PeriodicTimer::ready(int fd)
+EventAction OneShotTimer::ready(int fd)
 {
     if (fd == _timer_fd) {
         uint64_t expirations;
@@ -52,4 +78,5 @@ EventAction PeriodicTimer::ready(int fd)
 
     return EventAction::Continue;
 }
+
 

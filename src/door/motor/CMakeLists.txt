@@ -13,17 +13,16 @@ add_library(
 
 target_link_libraries(
     motor 
-    PRIVATE input_output_switch
+
+    PUBLIC
+
+    output
 )
 
 target_include_directories(
     motor
-    PRIVATE
+
+    PUBLIC
+
     ${CMAKE_SOURCE_DIR}/src
-)
-
-target_include_directories(
-    motor
-    INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}
 )

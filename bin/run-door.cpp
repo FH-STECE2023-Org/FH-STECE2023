@@ -13,6 +13,7 @@
 #include <door/analog_stuff/sensor/analog-sensor-event-generator.h> 
 #include <door/analog_stuff/sensor/analog-sensor-mock.h>          
 #include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/utilities/i2c-real.h>
 
 #include <door/motor/motor-mock.h>
 
@@ -29,8 +30,11 @@
 
 #include <door/utilities/eventloop.h>
 #include <door/utilities/periodic-timer.h>
+#include <door/utilities/one-shot-timer.h>
+#include <door/utilities/graceful-term.h>
 
 #include <door/utilities/timespec.h>
+
 
 // quit flag with atomic type
 static volatile sig_atomic_t quit = 0;
@@ -183,25 +187,39 @@ int main(int argc, char** argv)
     // set outputs
     outputs.set_outputs(out);
 
-    //1ms time
-    TimeSpec set_time(0, 1000000);
+    //Graceful termination
+    GracefulTerminator terminator;
+
+    //1ms periodic timer
+    TimeSpec set_periodic(0, 1000000);
+    PeriodicTimer periodic_timer(set_periodic,
+                            [&inputs, &outputs, &door]()
+                            {
+                                events_t ev  = inputs.get_events();
+                                output_t out = door.cyclic(ev);
+                                outputs.set_outputs(out);
+                            });
+    
+    //1s one shot timer
+    TimeSpec set_oneshot(1, 0);
+    OneShotTimer oneshot_timer(set_oneshot,
+                            []()
+                            {
+                                std::cout << "One Shot expired" << std::endl;
+                                //expired callback for oneshot timer
+                                //do whatever you need to do
+                            });
+
 
     //Eventloop
     Eventloop loop;
 
-    PeriodicTimer timer_handler(set_time,
-                                [&inputs, &outputs, &door]()
-                                {
-                                    events_t ev  = inputs.get_events();
-                                    output_t out = door.cyclic(ev);
-                                    outputs.set_outputs(out);
-                                });
-
-    timer_handler.hookup(loop);
+    terminator.hookup(loop);
+    periodic_timer.hookup(loop);
+    oneshot_timer.hookup(loop);
+    
     loop.run();
 
-
-//
     // cleanup before exit
     delete button_outside;
     delete button_inside;
@@ -210,12 +228,21 @@ int main(int argc, char** argv)
     delete pressureSensor;
     delete motor;
 
-    // Bye message
-    std::cout << std::endl;
-    std::cout << "Oh, I need to go, someone is calling me..." << std::endl;
-    std::cout << "Bye, see you soon :)" << std::endl;
-    std::cout << "I'll miss you <3" << std::endl;
-    std::cout << "  -- yours, Depperte Door" << std::endl << std::endl;
+    if(oneshot_timer.isrunning()) {
+        // Error
+        std::cout << std::endl;
+        std::cout << "One Shot Timer still running, deppert" << std::endl;
 
-    return 0;
+        return 1;
+    }
+    else {
+        // Bye message
+        std::cout << std::endl;
+        std::cout << "Oh, I need to go, someone is calling me..." << std::endl;
+        std::cout << "Bye, see you soon :)" << std::endl;
+        std::cout << "I'll miss you <3" << std::endl;
+        std::cout << "  -- yours, Depperte Door" << std::endl << std::endl;
+
+        return 0;
+    }
 }

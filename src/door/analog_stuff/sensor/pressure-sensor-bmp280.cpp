@@ -15,15 +15,11 @@
  * Constructor
  * -----------
  * Initializes the BMP280 sensor:
- * 1. Opens I2C connection via I2C utility
+ * 1. Uses the provided I2CInterface object
  * 2. Configures the sensor (oversampling, mode)
  * 3. Reads calibration data from the sensor
  */
-BMP280::BMP280(const std::string& device, uint8_t address)
-{
-    // Create I2C connection to BMP280
-    i2c_ = std::make_unique<I2C>(device, address);
-
+BMP280::BMP280(I2CInterface* i2c) : i2c_(i2c) {
     // Configure control register:
     //  - Temperature and Pressure oversampling x1
     //  - Normal mode
@@ -68,8 +64,7 @@ BMP280::BMP280(const std::string& device, uint8_t address)
  * Applies Bosch datasheet compensation formulas
  * Returns pressure in hPa
  */
-float BMP280::get_value() const
-{
+float BMP280::get_value() const {
     // Set pointer to pressure MSB register
     i2c_->write_reg(BMP280_REG_PRESSURE_MSB);
 
@@ -82,6 +77,10 @@ float BMP280::get_value() const
     // Combine bytes to 20-bit raw values
     int32_t raw_pressure = (raw_data[0] << 12) | (raw_data[1] << 4) | (raw_data[2] >> 4);
     int32_t raw_temp     = (raw_data[3] << 12) | (raw_data[4] << 4) | (raw_data[5] >> 4);
+
+    if (raw_pressure == 0 && raw_temp == 0) {
+    throw std::runtime_error("Invalid BMP280 measurement data");
+    }
 
     // Temperature compensation (t_fine) according to datasheet
     int32_t var1 = (((raw_temp >> 3) - ((int32_t)_dig_T1 << 1)) * ((int32_t)_dig_T2)) >> 11;
@@ -96,7 +95,7 @@ float BMP280::get_value() const
     p_var2 = p_var2 + ((p_var1 * (int64_t)_dig_P5) << 17);
     p_var2 = p_var2 + (((int64_t)_dig_P4) << 35);
     p_var1 = ((p_var1 * p_var1 * (int64_t)_dig_P3) >> 8) + ((p_var1 * (int64_t)_dig_P2) << 12);
-    p_var1 = (((((int64_t)1) << 47) + p_var1)) * ((int64_t)_dig_P1) >> 33;
+    p_var1 = ((((((int64_t)1) << 47) + p_var1)) * ((int64_t)_dig_P1) >> 33);
 
     double pressure = 0;
     if (p_var1 != 0) {

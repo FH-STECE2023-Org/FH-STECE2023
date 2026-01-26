@@ -7,14 +7,10 @@ add_library(
 
 target_include_directories(
     adc
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-)
 
-target_include_directories(
-    adc
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    PUBLIC
+
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries(adc PUBLIC utilities)

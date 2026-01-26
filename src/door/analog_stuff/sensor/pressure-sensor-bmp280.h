@@ -1,7 +1,7 @@
 #pragma once
 
 #include "analog-sensor.h"
-#include <door/utilities/i2c.h>
+#include <door/utilities/i2c-interface.h>
 #include <memory>
 
 /*
@@ -14,15 +14,13 @@ class BMP280 : public AnalogSensor
 public:
     /*
      * Constructor
-     *  - device: I2C device path (e.g., "/dev/i2c-1")
-     *  - address: I2C address of the sensor (default 0x76)
+     *  - i2c: Pointer to an I2CInterface object (ownership remains with the caller)
      */
-    BMP280(const std::string& device = "/dev/i2c-1", uint8_t address = 0x76);
+    BMP280(I2CInterface* i2c);
 
     /*
      * Destructor
      *  - defaulted here in the header
-     *  - unique_ptr handles cleanup of the I2C connection automatically
      */
     ~BMP280() override = default;
 
@@ -33,7 +31,7 @@ public:
 
 private:
     // I2C connection to the sensor
-    std::unique_ptr<I2C> i2c_;
+    I2CInterface* i2c_;
 
     // Calibration coefficients from sensor
     uint16_t _dig_T1;

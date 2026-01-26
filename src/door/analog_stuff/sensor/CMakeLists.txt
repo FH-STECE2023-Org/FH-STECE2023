@@ -12,17 +12,17 @@ add_library(
 
 target_link_libraries(
     sensor
-    PRIVATE adc utilities
+
+    PUBLIC
+
+    adc
+    utilities
 )
 
 target_include_directories(
     sensor
-    PRIVATE
+
+    PUBLIC
+
     ${CMAKE_SOURCE_DIR}/src
-)
-
-target_include_directories(
-    sensor
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
 )

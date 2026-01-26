@@ -12,20 +12,20 @@ add_library(
 
 target_link_libraries(
     statemachine
-    PUBLIC motor
-    PUBLIC utilities
-    PUBLIC input_output_switch
-    PUBLIC analog_stuff
+
+    PUBLIC
+
+    motor
+    utilities
+    input
+    output
+    sensor
 )
 
 target_include_directories(
     statemachine
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
 
-target_include_directories(
-    statemachine
-    PRIVATE
+    PUBLIC
+
     ${CMAKE_SOURCE_DIR}/src
 )

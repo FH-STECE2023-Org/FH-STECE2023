@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/utilities/i2c-real.h>
 
 // Dies ist ein einfaches, eigenständiges Programm mit einer main()-Funktion.
 int main()
@@ -8,10 +9,12 @@ int main()
     try
     {
         // Erzeuge das Sensor-Objekt. Die Initialisierung passiert im Konstruktor.
-        BMP280 sensor("/dev/i2c-1", 0x76);
+        I2CReal* i2c = new I2CReal("/dev/i2c-1", 0x76);
+        BMP280* pressureSensor = new BMP280(i2c);
+
 
         // Lies den Druck aus und gib ihn auf der Konsole aus.
-        float pressure = sensor.get_value();
+        float pressure = pressureSensor->get_value();
         std::cout << "Pressure: " << pressure << " hPa" << std::endl;
     }
     catch (const std::runtime_error& e)

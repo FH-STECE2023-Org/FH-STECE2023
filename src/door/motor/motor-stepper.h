@@ -2,7 +2,7 @@
 
 #include "motor.h"
 #include <string>
-#include "output-switch-gpio-sysfs.h"
+#include "input-output-switch/output/output-switch-gpio-sysfs.h"
 
 class MotorStepper : public Motor
 {

@@ -11,6 +11,7 @@ class PeriodicTimer : public InputHandler
 {
 public:
     PeriodicTimer(TimeSpec set_time, std::function<void()>);
+    ~PeriodicTimer() override;
     void hookup(Eventloop&);
     EventAction ready(int fd) override;
 

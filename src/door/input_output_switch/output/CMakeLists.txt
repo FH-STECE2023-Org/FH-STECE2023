@@ -10,12 +10,8 @@ add_library(
 
 target_include_directories(
     output
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/src
-)
 
-target_include_directories(
-    output
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    PUBLIC
+
+    ${CMAKE_SOURCE_DIR}/src
 )
