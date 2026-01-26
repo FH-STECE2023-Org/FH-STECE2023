@@ -9,8 +9,9 @@ int main()
     try
     {
         // Erzeuge das Sensor-Objekt. Die Initialisierung passiert im Konstruktor.
-        I2CReal* i2c = new I2CReal("/dev/i2c-1", 0x76);
-        BMP280* pressureSensor = new BMP280(i2c);
+        auto i2c = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
+        auto pressureSensor = std::make_shared<BMP280>(i2c);
+        //auto pressureSensor =BMP280(i2c);
 
 
         // Lies den Druck aus und gib ihn auf der Konsole aus.

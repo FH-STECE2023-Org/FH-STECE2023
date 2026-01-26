@@ -22,7 +22,7 @@
 #include <string>
 #include <iostream>
 #include <signal.h>
-#include <memory>
+
 
 #include <door/utilities/eventloop.h>
 #include <door/utilities/periodic-timer.h>

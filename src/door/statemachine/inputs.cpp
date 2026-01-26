@@ -1,7 +1,7 @@
 #include "inputs.h"
 #include <door/utilities/event-edge-detector.h>
 #include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
-#include <memory>
+
 
 
 Inputs::Inputs(std::shared_ptr<InputSwitch> button_outside, std::shared_ptr<InputSwitch> button_inside, std::shared_ptr<InputSwitch> lightbarrier_closed, std::shared_ptr<InputSwitch> lightbarrier_open, std::shared_ptr<AnalogSensorEventGenerator> analogsensor, const TimeSpec& debounce_time)

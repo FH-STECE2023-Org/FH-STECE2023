@@ -10,7 +10,7 @@ class Inputs
 {
 public:
     Inputs(std::shared_ptr<InputSwitch> button_outside, std::shared_ptr<InputSwitch> button_inside, std::shared_ptr<InputSwitch> light_barrier_closed, std::shared_ptr<InputSwitch> light_barrier_open, std::shared_ptr<AnalogSensorEventGenerator> Analogsensor, const TimeSpec& debounce_time);
-    ~Inputs();
+    ~Inputs() = default;
 
     // void check(const Events& events);
     input_t get_inputs();

@@ -18,23 +18,23 @@ static std::vector<uint8_t> valid_measurement_data() {
 // ---------------------------- Tests -----------------------------
 
 TEST(BMP280MockTest, FirstMeasurementFailsOnZeroData) {
-    I2CMock mock;
-    mock.push_read_response(valid_calibration_data());
-    mock.push_read_response({0,0,0,0,0,0});
+    auto mock = std::make_shared<I2CMock>();
+    mock->push_read_response(valid_calibration_data());
+    mock->push_read_response({0,0,0,0,0,0});
 
-    BMP280 sensor(&mock);
+    BMP280 sensor(mock);
 
     EXPECT_THROW(sensor.get_value(), std::runtime_error);
 }
 
 TEST(BMP280MockTest, ThirdMeasurementFailsOnZeroData) {
-    I2CMock mock;
-    mock.push_read_response(valid_calibration_data());
-    mock.push_read_response(valid_measurement_data()); // 1st read
-    mock.push_read_response(valid_measurement_data()); // 2nd read
-    mock.push_read_response({0,0,0,0,0,0});            // 3rd read
+    auto mock = std::make_shared<I2CMock>();
+    mock->push_read_response(valid_calibration_data());
+    mock->push_read_response(valid_measurement_data()); // 1st read
+    mock->push_read_response(valid_measurement_data()); // 2nd read
+    mock->push_read_response({0,0,0,0,0,0});            // 3rd read
 
-    BMP280 sensor(&mock);
+    BMP280 sensor(mock);
 
     EXPECT_NO_THROW(sensor.get_value()); // 1st
     EXPECT_NO_THROW(sensor.get_value()); // 2nd
