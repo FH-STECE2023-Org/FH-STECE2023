@@ -19,7 +19,7 @@
  * 2. Configures the sensor (oversampling, mode)
  * 3. Reads calibration data from the sensor
  */
-BMP280::BMP280(I2CInterface* i2c) : i2c_(i2c) {
+BMP280::BMP280(std::shared_ptr<I2CInterface> i2c) : i2c_(i2c) {
     // Configure control register:
     //  - Temperature and Pressure oversampling x1
     //  - Normal mode

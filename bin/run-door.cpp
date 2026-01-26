@@ -121,25 +121,25 @@ int main(int argc, char** argv)
         lightbarrier_open   = std::make_shared<InputSwitchGPIOSysfs>(23);
 
         i2c = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
-        pressureSensor = std::make_shared<BMP280>(i2c.get());
+        pressureSensor = std::make_shared<BMP280>(i2c);
 
         // motor = std::make_shared<MotorStepper>(...);
     }
 
     // Event generator uses the sensor, lifetime guaranteed by shared_ptr
-    AnalogSensorEventGenerator pressureSensorEG(pressureSensor.get());
+    AnalogSensorEventGenerator pressureSensorEG(pressureSensor);
 
     TimeSpec time;
 
     Inputs inputs(
-        button_outside.get(),
-        button_inside.get(),
-        lightbarrier_closed.get(),
-        lightbarrier_open.get(),
+        button_outside,
+        button_inside,
+        lightbarrier_closed,
+        lightbarrier_open,
         &pressureSensorEG,
         time);
 
-    Outputs outputs(motor.get());
+    Outputs outputs(motor);
 
     input_t in = inputs.get_inputs();
     output_t out = door.init(in);

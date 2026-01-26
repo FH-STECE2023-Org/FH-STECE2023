@@ -1,6 +1,7 @@
 #pragma once
 
 #include "structs.h"
+#include <memory>
 #include <door/utilities/timespec.h>
 #include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
 
@@ -23,8 +24,10 @@ private:
     InputSwitch* _lightbarrier_open;
     AnalogSensorEventGenerator* _Analogsensor;
 
-    EdgeDetector *_edge_button_outside;
-    EdgeDetector *_edge_button_inside;
-    EdgeDetector *_edge_lightbarrier_closed;
-    EdgeDetector *_edge_lightbarrier_open;
+    std::shared_ptr<EdgeDetector> _edge_button_outside;
+    std::shared_ptr<EdgeDetector> _edge_button_inside;
+    std::shared_ptr<EdgeDetector> _edge_lightbarrier_closed;
+    std::shared_ptr<EdgeDetector> _edge_lightbarrier_open;
+
+
 };

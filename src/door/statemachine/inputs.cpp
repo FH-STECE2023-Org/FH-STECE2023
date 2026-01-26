@@ -1,6 +1,7 @@
 #include "inputs.h"
 #include <door/utilities/event-edge-detector.h>
 #include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
+#include <memory>
 
 
 Inputs::Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* lightbarrier_closed, InputSwitch* lightbarrier_open, AnalogSensorEventGenerator* analogsensor, const TimeSpec& debounce_time)
@@ -11,19 +12,12 @@ Inputs::Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwi
     _lightbarrier_open = lightbarrier_open;
     _Analogsensor = analogsensor;
 
-    _edge_button_outside = new EdgeDetector(button_outside, debounce_time);
-    _edge_button_inside = new EdgeDetector(button_inside, debounce_time);
-    _edge_lightbarrier_closed = new EdgeDetector(lightbarrier_closed, debounce_time);
-    _edge_lightbarrier_open = new EdgeDetector(lightbarrier_open, debounce_time);
+    _edge_button_outside = std::make_shared<EdgeDetector>(button_outside, debounce_time);
+    _edge_button_inside = std::make_shared<EdgeDetector>(button_inside, debounce_time);
+    _edge_lightbarrier_closed = std::make_shared<EdgeDetector>(lightbarrier_closed, debounce_time);
+    _edge_lightbarrier_open = std::make_shared<EdgeDetector>(lightbarrier_open, debounce_time);
 }
 
-Inputs::~Inputs()
-{
-    delete _edge_button_outside;
-    delete _edge_button_inside;
-    delete _edge_lightbarrier_closed;
-    delete _edge_lightbarrier_open;
-}
 
 input_t Inputs::get_inputs()
 {
