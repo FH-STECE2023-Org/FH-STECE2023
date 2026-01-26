@@ -109,8 +109,8 @@ int main(int argc, char** argv)
     InputSwitch* button_inside;
     InputSwitch* lightbarrier_closed;
     InputSwitch* lightbarrier_open;
-    OutputSwitch* motor_forward_switch;
-    OutputSwitch* motor_backward_switch;
+    OutputSwitch* motor_line_en;
+    OutputSwitch* motor_line_dir;
     AnalogSensor* pressureSensor;
     Motor* motor;
 
@@ -134,9 +134,9 @@ int main(int argc, char** argv)
     std::string             Motor_T_Period = "2000000";
     std::string             Motor_T_Duty = "1000000";
 
-    motor_forward_switch = new OutputSwitchGPIOSysfs(26 + OFFSET_GPIO);
-    motor_backward_switch = new OutputSwitchGPIOSysfs(17 + OFFSET_GPIO);
-    
+    motor_line_en = new OutputSwitchGPIOSysfs(26 + OFFSET_GPIO);
+    motor_line_dir = new OutputSwitchGPIOSysfs(17 + OFFSET_GPIO);
+
     if (test)
     {
         // Mock sensors
@@ -164,8 +164,8 @@ int main(int argc, char** argv)
 
         // Pressure Sensor
         pressureSensor      = new BMP280(PressureSensor_Device, PressureSensor_Adress);
-
-        motor               = new MotorStepper(Motor_Device, *motor_forward_switch, *motor_backward_switch, Motor_T_Period, Motor_T_Duty);
+        // motor device not needed
+        motor               = new MotorStepper(Motor_Device, *motor_line_en, *motor_line_dir, Motor_T_Period, Motor_T_Duty);
     }
 
     // Pressure Sensor Event Generator
