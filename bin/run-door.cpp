@@ -201,7 +201,7 @@ int main(int argc, char** argv)
     loop.run();
 
 
-
+//
     // cleanup before exit
     delete button_outside;
     delete button_inside;
