@@ -1,6 +1,6 @@
 #include "event-edge-detector.h"
 
-EdgeDetector::EdgeDetector(InputSwitch* input, const TimeSpec& debounce_time)
+EdgeDetector::EdgeDetector(std::shared_ptr<InputSwitch> input, const TimeSpec& debounce_time)
 {
     _input = input;
     _old_state = _input->get_state();

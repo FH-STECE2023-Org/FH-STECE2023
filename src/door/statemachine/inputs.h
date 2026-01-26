@@ -9,7 +9,7 @@
 class Inputs
 {
 public:
-    Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* light_barrier_closed, InputSwitch* light_barrier_open, AnalogSensorEventGenerator* Analogsensor, const TimeSpec& debounce_time);
+    Inputs(std::shared_ptr<InputSwitch> button_outside, std::shared_ptr<InputSwitch> button_inside, std::shared_ptr<InputSwitch> light_barrier_closed, std::shared_ptr<InputSwitch> light_barrier_open, std::shared_ptr<AnalogSensorEventGenerator> Analogsensor, const TimeSpec& debounce_time);
     ~Inputs();
 
     // void check(const Events& events);
@@ -18,11 +18,11 @@ public:
 
     
 private:
-    InputSwitch* _button_outside;
-    InputSwitch* _button_inside;
-    InputSwitch* _lightbarrier_closed;
-    InputSwitch* _lightbarrier_open;
-    AnalogSensorEventGenerator* _Analogsensor;
+    std::shared_ptr<InputSwitch> _button_outside;
+    std::shared_ptr<InputSwitch> _button_inside;
+    std::shared_ptr<InputSwitch> _lightbarrier_closed;
+    std::shared_ptr<InputSwitch> _lightbarrier_open;
+    std::shared_ptr<AnalogSensorEventGenerator> _Analogsensor;
 
     std::shared_ptr<EdgeDetector> _edge_button_outside;
     std::shared_ptr<EdgeDetector> _edge_button_inside;

@@ -4,7 +4,7 @@
 #include <memory>
 
 
-Inputs::Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* lightbarrier_closed, InputSwitch* lightbarrier_open, AnalogSensorEventGenerator* analogsensor, const TimeSpec& debounce_time)
+Inputs::Inputs(std::shared_ptr<InputSwitch> button_outside, std::shared_ptr<InputSwitch> button_inside, std::shared_ptr<InputSwitch> lightbarrier_closed, std::shared_ptr<InputSwitch> lightbarrier_open, std::shared_ptr<AnalogSensorEventGenerator> analogsensor, const TimeSpec& debounce_time)
 {
     _button_outside = button_outside;
     _button_inside = button_inside;

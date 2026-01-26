@@ -127,7 +127,8 @@ int main(int argc, char** argv)
     }
 
     // Event generator uses the sensor, lifetime guaranteed by shared_ptr
-    AnalogSensorEventGenerator pressureSensorEG(pressureSensor);
+    auto pressureSensorEG = std::make_shared<AnalogSensorEventGenerator>(pressureSensor);
+
 
     TimeSpec time;
 
@@ -136,7 +137,7 @@ int main(int argc, char** argv)
         button_inside,
         lightbarrier_closed,
         lightbarrier_open,
-        &pressureSensorEG,
+        pressureSensorEG,
         time);
 
     Outputs outputs(motor);

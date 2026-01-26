@@ -1,5 +1,6 @@
 #pragma once
 #include "analog-sensor.h"
+#include <memory>
 
 enum class AnalogSensorEvent
 {
@@ -12,7 +13,7 @@ enum class AnalogSensorEvent
 class AnalogSensorEventGenerator
 {
     public:
-        AnalogSensorEventGenerator(AnalogSensor* sensor, 
+        AnalogSensorEventGenerator(std::shared_ptr<AnalogSensor> sensor, 
                                      float under_value = 0.0f, 
                                      float over_value = 0.0f,
                                      bool hysteresis_enabled = false,
@@ -25,7 +26,7 @@ class AnalogSensorEventGenerator
         // get_event updates internal state when hysteresis is enabled
         AnalogSensorEvent get_event();
     private:
-        AnalogSensor* _sensor;
+        std::shared_ptr<AnalogSensor> _sensor;
         float _under_value;
         float _over_value;
         
