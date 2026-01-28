@@ -16,7 +16,7 @@ public:
      * Constructor
      *  - i2c: Pointer to an I2CInterface object (ownership remains with the caller)
      */
-    BMP280(I2CInterface* i2c);
+    BMP280(std::shared_ptr<I2CInterface> i2c);
 
     /*
      * Destructor
@@ -31,7 +31,7 @@ public:
 
 private:
     // I2C connection to the sensor
-    I2CInterface* i2c_;
+    std::shared_ptr<I2CInterface> i2c_;
 
     // Calibration coefficients from sensor
     uint16_t _dig_T1;

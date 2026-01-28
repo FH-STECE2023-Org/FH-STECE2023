@@ -11,31 +11,31 @@ int main(int argc, char** argv)
     using namespace std::chrono_literals;
 
     // Erstelle ein I2CReal-Objekt für den BMP280-Sensor
-    std::unique_ptr<I2CReal> i2c_real = std::make_unique<I2CReal>("/dev/i2c-1", 0x76);
+    std::shared_ptr<I2CReal> i2c_real = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
 
     // Erstelle den BMP280-Sensor mit dem I2CReal-Objekt
-    BMP280 bmp(i2c_real.get());
+    auto bmp = std::make_shared<BMP280>(i2c_real);
 
     // Falls keine Schwellenwerte angegeben wurden, berechne Standardwerte um den ersten Messwert
-    float first = bmp.get_value();
+    float first = bmp->get_value();
 
     float under = first - 5.0f;
     float over = first + 5.0f;
     float hysteresis = 0.5f;
     int poll_ms = 1000;
 
-    AnalogSensorEventGenerator gen(&bmp, under, over, true, hysteresis);
+    AnalogSensorEventGenerator gen(bmp, under, over, true, hysteresis);
 
     AnalogSensorEvent last = gen.get_event();
     {
-        std::printf("Initial event: %d pressure=%.2f\n", static_cast<int>(last), bmp.get_value());
+        std::printf("Initial event: %d pressure=%.2f\n", static_cast<int>(last), bmp->get_value());
     }
 
     while (true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(poll_ms));
         float p = 0.0f;
         try {
-            p = bmp.get_value();
+            p = bmp->get_value();
         } catch (const std::exception& e) {
             std::fprintf(stderr, "Read error: %s\n", e.what());
             continue;

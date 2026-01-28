@@ -10,8 +10,8 @@
 #include <door/input_output_switch/output/output-switch.h>
 
 #include <door/analog_stuff/sensor/analog-sensor.h>
-#include <door/analog_stuff/sensor/analog-sensor-event-generator.h> 
-#include <door/analog_stuff/sensor/analog-sensor-mock.h>          
+#include <door/analog_stuff/sensor/analog-sensor-event-generator.h>
+#include <door/analog_stuff/sensor/analog-sensor-mock.h>
 #include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
 #include <door/utilities/i2c-real.h>
 
@@ -23,18 +23,16 @@
 #include <iostream>
 #include <signal.h>
 
+
 #include <door/utilities/eventloop.h>
 #include <door/utilities/periodic-timer.h>
 #include <door/utilities/one-shot-timer.h>
 #include <door/utilities/graceful-term.h>
 
-#include <door/utilities/timespec.h>
-
-
 // quit flag with atomic type
 static volatile sig_atomic_t quit = 0;
 
-// hander function to set quit flag
+// handler function to set quit flag
 static void handler(int signal)
 {
     if (signal == SIGINT || signal == SIGTERM)
@@ -43,41 +41,29 @@ static void handler(int signal)
 
 int main(int argc, char** argv)
 {
-    // test flag
     int test = 0;
     int real = 0;
 
-
-    // too many arguments
     if (argc > 2)
     {
         std::cout << "Error: Too many arguments!" << std::endl;
         std::cout << "Usage: ./run-door [--test/--real]" << std::endl;
-        
         return 1;
     }
 
-    // one additional argument
     if (argc == 2)
     {
         std::string flag = argv[1];
-        if (flag == "--test")
-        {
-            test = 1;
-        }
-        else if(flag == "--real")
-        {
-            real = 1;
-        }
+        if (flag == "--test") test = 1;
+        else if (flag == "--real") real = 1;
         else
         {
-            std::cout << "Error: Invalide argument!" << std::endl;
+            std::cout << "Error: Invalid argument!" << std::endl;
             std::cout << "Usage: ./run-door [--test/--real]" << std::endl;
-
             return 1;
         }
     }
-    else 
+    else
     {
         std::cout << "Error: Missing argument!" << std::endl;
         std::cout << "Usage: ./run-door [--test/--real]" << std::endl;
@@ -88,138 +74,117 @@ int main(int argc, char** argv)
     struct sigaction sa = { 0 };
     sa.sa_handler = handler;
 
-    int rv = sigaction(SIGTERM, &sa, nullptr);
-    if (rv == -1)
+    if (sigaction(SIGTERM, &sa, nullptr) == -1)
     {
         perror("sigaction(SIGTERM)");
         return 1;
     }
-    rv = sigaction(SIGINT, &sa, nullptr);
-    if (rv == -1)
+    if (sigaction(SIGINT, &sa, nullptr) == -1)
     {
         perror("sigaction(SIGINT)");
         return 1;
     }
 
-    // create door
     Door door;
 
-    InputSwitch* button_outside;
-    InputSwitch* button_inside;
-    InputSwitch* lightbarrier_closed;
-    InputSwitch* lightbarrier_open;
-    AnalogSensor* pressureSensor;
-    Motor* motor;
+    // Shared ownership for all resources
+    std::shared_ptr<InputSwitch> button_outside;
+    std::shared_ptr<InputSwitch> button_inside;
+    std::shared_ptr<InputSwitch> lightbarrier_closed;
+    std::shared_ptr<InputSwitch> lightbarrier_open;
+    std::shared_ptr<AnalogSensor> pressureSensor;
+    std::shared_ptr<Motor> motor;
+
+    // Keep I2C alive as long as the sensor lives
+    std::shared_ptr<I2CReal> i2c;
 
     if (test)
     {
-        // Mock sensors
         std::cout << "Info: Test run, only using mock sensors." << std::endl;
 
-        // Buttons
-        button_outside = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
-        button_inside = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
-        // Lightbarriers
-        lightbarrier_closed = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
-        lightbarrier_open = new InputSwitchMock(InputSwitch::State::INPUT_HIGH);
-        // Pressure sensor
-        pressureSensor = new AnalogSensorMock();
-        // Motor
-        motor = new MotorMock(Motor::Direction::IDLE);
+        button_outside = std::make_shared<InputSwitchMock>(InputSwitch::State::INPUT_LOW);
+        button_inside  = std::make_shared<InputSwitchMock>(InputSwitch::State::INPUT_LOW);
+
+        lightbarrier_closed = std::make_shared<InputSwitchMock>(InputSwitch::State::INPUT_LOW);
+        lightbarrier_open   = std::make_shared<InputSwitchMock>(InputSwitch::State::INPUT_HIGH);
+
+        pressureSensor = std::make_shared<AnalogSensorMock>();
+        motor = std::make_shared<MotorMock>(Motor::Direction::IDLE);
     }
     else if (real)
     {
         std::cout << "Info: Real run, using real sensors." << std::endl;
-        // create sensors
-        button_outside = new InputSwitchGPIOSysfs(17);
-        button_inside = new InputSwitchGPIOSysfs(27);
-        lightbarrier_closed  = new InputSwitchGPIOSysfs(22);
-        lightbarrier_open  = new InputSwitchGPIOSysfs(23);
 
-        // Pressure Sensor
-        I2CReal* i2c = new I2CReal("/dev/i2c-1", 0x76);
-        pressureSensor = new BMP280(i2c);
+        button_outside = std::make_shared<InputSwitchGPIOSysfs>(17);
+        button_inside  = std::make_shared<InputSwitchGPIOSysfs>(27);
+        lightbarrier_closed = std::make_shared<InputSwitchGPIOSysfs>(22);
+        lightbarrier_open   = std::make_shared<InputSwitchGPIOSysfs>(23);
 
+        i2c = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
+        pressureSensor = std::make_shared<BMP280>(i2c);
 
-        //motor = new MotorStepper("/dev/gpiochip0", 26, 17, "2000000", "1000000");
+        // motor = std::make_shared<MotorStepper>(...);
     }
 
-    // Pressure Sensor Event Generator
-    AnalogSensorEventGenerator pressureSensorEG(pressureSensor);
+    // Event generator uses the sensor, lifetime guaranteed by shared_ptr
+    auto pressureSensorEG = std::make_shared<AnalogSensorEventGenerator>(pressureSensor);
+
 
     TimeSpec time;
 
-    Inputs inputs(button_outside, button_inside, lightbarrier_closed, lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs(
+        button_outside,
+        button_inside,
+        lightbarrier_closed,
+        lightbarrier_open,
+        pressureSensorEG,
+        time);
+
     Outputs outputs(motor);
 
-    input_t in;
-    output_t out;
-    
-    // get current inputs and create input struct
-    in = inputs.get_inputs();
-
-    // run door init and return output struct
-    out = door.init(in);
-
-    // set outputs
+    input_t in = inputs.get_inputs();
+    output_t out = door.init(in);
     outputs.set_outputs(out);
 
-    //Graceful termination
     GracefulTerminator terminator;
 
-    //1ms periodic timer
+    // 1 ms periodic timer
     TimeSpec set_periodic(0, 1000000);
     PeriodicTimer periodic_timer(set_periodic,
-                            [&inputs, &outputs, &door]()
-                            {
-                                events_t ev  = inputs.get_events();
-                                output_t out = door.cyclic(ev);
-                                outputs.set_outputs(out);
-                            });
-    
-    //1s one shot timer
+        [&inputs, &outputs, &door]()
+        {
+            events_t ev = inputs.get_events();
+            output_t out = door.cyclic(ev);
+            outputs.set_outputs(out);
+        });
+
+    // 1 s one-shot timer
     TimeSpec set_oneshot(1, 0);
     OneShotTimer oneshot_timer(set_oneshot,
-                            []()
-                            {
-                                std::cout << "One Shot expired" << std::endl;
-                                //expired callback for oneshot timer
-                                //do whatever you need to do
-                            });
+        []()
+        {
+            std::cout << "One Shot expired" << std::endl;
+        });
 
-
-    //Eventloop
     Eventloop loop;
-
     terminator.hookup(loop);
     periodic_timer.hookup(loop);
     oneshot_timer.hookup(loop);
-    
+
     loop.run();
 
-    // cleanup before exit
-    delete button_outside;
-    delete button_inside;
-    delete lightbarrier_closed;
-    delete lightbarrier_open;
-    delete pressureSensor;
-    delete motor;
+    // No manual delete needed (shared_ptr)
 
-    if(oneshot_timer.isrunning()) {
-        // Error
-        std::cout << std::endl;
-        std::cout << "One Shot Timer still running, deppert" << std::endl;
-
+    if (oneshot_timer.isrunning())
+    {
+        std::cout << "\nOne Shot Timer still running, deppert" << std::endl;
         return 1;
     }
-    else {
-        // Bye message
-        std::cout << std::endl;
-        std::cout << "Oh, I need to go, someone is calling me..." << std::endl;
-        std::cout << "Bye, see you soon :)" << std::endl;
-        std::cout << "I'll miss you <3" << std::endl;
-        std::cout << "  -- yours, Depperte Door" << std::endl << std::endl;
 
-        return 0;
-    }
+    std::cout << "\nOh, I need to go, someone is calling me..." << std::endl;
+    std::cout << "Bye, see you soon :)" << std::endl;
+    std::cout << "I'll miss you <3" << std::endl;
+    std::cout << "  -- yours, Depperte Door" << std::endl << std::endl;
+
+    return 0;
 }

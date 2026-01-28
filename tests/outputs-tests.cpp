@@ -7,8 +7,8 @@
 TEST(output_suite, motor_forward)
 {
     // create output
-    MotorMock motor(Motor::Direction::IDLE);
-    Outputs output(&motor);
+    auto motor = std::make_shared<MotorMock>(Motor::Direction::IDLE);
+    Outputs output(motor);
     output_t out;
 
     // set output
@@ -16,14 +16,14 @@ TEST(output_suite, motor_forward)
     output.set_outputs(out);
 
     // test actors
-    ASSERT_EQ(motor.get_direction(), Motor::Direction::FORWARD);
+    ASSERT_EQ(motor->get_direction(), Motor::Direction::FORWARD);
 }
 
 TEST(output_suite, motor_backward)
 {
     // create output
-    MotorMock motor(Motor::Direction::IDLE);
-    Outputs output(&motor);
+    auto motor = std::make_shared<MotorMock>(Motor::Direction::IDLE);
+    Outputs output(motor);
     output_t out;
 
     // set output
@@ -31,14 +31,14 @@ TEST(output_suite, motor_backward)
     output.set_outputs(out);
 
     // test actors
-    ASSERT_EQ(motor.get_direction(), Motor::Direction::BACKWARD);
+    ASSERT_EQ(motor->get_direction(), Motor::Direction::BACKWARD);
 }
 
 TEST(output_suite, motor_stop)
 {
     // create output
-    MotorMock motor(Motor::Direction::IDLE);
-    Outputs output(&motor);
+    auto motor = std::make_shared<MotorMock>(Motor::Direction::IDLE);
+    Outputs output(motor);
     output_t out;
 
     // set output
@@ -46,5 +46,5 @@ TEST(output_suite, motor_stop)
     output.set_outputs(out);
 
     // test actors
-    ASSERT_EQ(motor.get_direction(), Motor::Direction::IDLE);
+    ASSERT_EQ(motor->get_direction(), Motor::Direction::IDLE);
 }

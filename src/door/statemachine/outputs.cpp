@@ -1,7 +1,7 @@
 #include "outputs.h"
 #include <door/motor/motor.h>
 
-Outputs::Outputs(Motor* motor)
+Outputs::Outputs(std::shared_ptr<Motor> motor)
 {
     _motor = motor;
 }
