@@ -2,12 +2,12 @@
 
 #include "motor.h"
 #include <string>
-#include <door/input_output_switch/output/output-switch.h>
+#include <door/input_output_switch/output/output-switch-gpio-sysfs.h>
 
 class MotorStepper : public Motor
 {
     public:
-        MotorStepper(const std::string& gpiodevice, OutputSwitch& line_enable, OutputSwitch& line_direction, std::string period_nanosec, std::string duty_nanosec);
+        MotorStepper();
         ~MotorStepper();
 
         void forward() override;
@@ -20,8 +20,8 @@ class MotorStepper : public Motor
         int writeData(std::string path, std::string value);
         int ensureExported();
 
-        OutputSwitch& _line_enable;
-        OutputSwitch& _line_direction;
+        OutputSwitchGPIOSysfs _line_enable;
+        OutputSwitchGPIOSysfs _line_direction;
         
         Direction _direction;
         std::string _period_nanosec;

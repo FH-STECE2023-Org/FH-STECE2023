@@ -17,10 +17,15 @@
 
 #include <door/motor/motor-mock.h>
 
+#include <door/input_output_switch/input/input-switch-gpio-sysfs.h>
+#include <door/input_output_switch/output/output-switch-gpio-sysfs.h>
+#include <door/analog_stuff/sensor/pressure-sensor-bmp280.h>
+#include <door/motor/motor-stepper.h>
 #include <door/utilities/timespec.h>
 
 #include <string>
 #include <iostream>
+#include <memory>
 #include <signal.h>
 
 
@@ -98,6 +103,26 @@ int main(int argc, char** argv)
     // Keep I2C alive as long as the sensor lives
     std::shared_ptr<I2CReal> i2c;
 
+    unsigned int OFFSET_GPIO = 512;
+
+    // Button
+    unsigned int Button_outside_line = 18 + OFFSET_GPIO;
+    unsigned int Button_inside_line = 27 + OFFSET_GPIO;
+
+    // Lightbarrier GPIO lines
+    unsigned int Lightbarrier_closed_line = 22 + OFFSET_GPIO;
+    unsigned int Lightbarrier_open_line = 23 + OFFSET_GPIO;
+
+
+    // Pressure Sensor GPIO lines
+    std::string             PressureSensor_Device = "/dev/i2c-1";
+    uint8_t                 PressureSensor_Adress = 0x76;
+    
+    // Motor stepper GPIO lines
+    std::string             Motor_Device = "/dev/gpiochip0";
+    std::string             Motor_T_Period = "2000000";
+    std::string             Motor_T_Duty = "1000000";
+
     if (test)
     {
         std::cout << "Info: Test run, only using mock sensors." << std::endl;
@@ -115,15 +140,27 @@ int main(int argc, char** argv)
     {
         std::cout << "Info: Real run, using real sensors." << std::endl;
 
-        button_outside = std::make_shared<InputSwitchGPIOSysfs>(17);
-        button_inside  = std::make_shared<InputSwitchGPIOSysfs>(27);
-        lightbarrier_closed = std::make_shared<InputSwitchGPIOSysfs>(22);
-        lightbarrier_open   = std::make_shared<InputSwitchGPIOSysfs>(23);
+        // button_outside = std::make_shared<InputSwitchGPIOSysfs>(17);
+        // button_inside  = std::make_shared<InputSwitchGPIOSysfs>(27);
+        // lightbarrier_closed = std::make_shared<InputSwitchGPIOSysfs>(22);
+        // lightbarrier_open   = std::make_shared<InputSwitchGPIOSysfs>(23);
 
-        i2c = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
-        pressureSensor = std::make_shared<BMP280>(i2c);
+        // i2c = std::make_shared<I2CReal>("/dev/i2c-1", 0x76);
+        // pressureSensor = std::make_shared<BMP280>(i2c);
 
-        // motor = std::make_shared<MotorStepper>(...);
+        // // motor = std::make_shared<MotorStepper>(...);
+
+        // create sensors
+        button_outside      = std::make_shared<InputSwitchGPIOSysfs>(Button_outside_line);
+        button_inside       = std::make_shared<InputSwitchGPIOSysfs>(Button_inside_line);
+        lightbarrier_closed = std::make_shared<InputSwitchGPIOSysfs>(Lightbarrier_closed_line);
+        lightbarrier_open   = std::make_shared<InputSwitchGPIOSysfs>(Lightbarrier_open_line);
+
+        // Pressure Sensor
+        pressureSensor      = std::make_shared<BMP280>(
+            std::make_shared<I2CReal>(PressureSensor_Device, PressureSensor_Adress));
+        // motor device
+        motor               = std::make_shared<MotorStepper>();
     }
 
     // Event generator uses the sensor, lifetime guaranteed by shared_ptr
