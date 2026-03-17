@@ -102,17 +102,17 @@ public:
 private:
     void run_child_logic()
     {
-        AnalogSensorMock bmp;
-        bmp.set_value(1000.0f);
+        auto bmp = std::shared_ptr<AnalogSensorMock>();
+        bmp->set_value(1000.0f);
 
-        float first = bmp.get_value();
+        float first = bmp->get_value();
         float under = first - 5.0f;
         float over = first + 5.0f;
         float hysteresis = 0.5f;
         int poll_ms = 1000;
         float step = 1.0f;
 
-        AnalogSensorEventGenerator gen(&bmp, under, over, true, hysteresis);
+        AnalogSensorEventGenerator gen(bmp, under, over, true, hysteresis);
         AnalogSensorEvent last = gen.get_event();
         
         // Push initial state to parent
@@ -123,14 +123,14 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(poll_ms));
 
             // Mock sensor drift
-            float val = bmp.get_value();
+            float val = bmp->get_value();
             if (val >= over + 2.0f) step = -1.0f;
             if (val <= under - 2.0f) step = 1.0f;
-            bmp.set_value(val + step);
+            bmp->set_value(val + step);
 
             float p = 0.0f;
             try {
-                p = bmp.get_value();
+                p = bmp->get_value();
             } catch (const std::exception& e) {
                 std::fprintf(stderr, "[Child] Read error: %s\n", e.what());
                 continue;
