@@ -93,6 +93,7 @@ add_test(
 add_executable(bmp280_test bmp280-test.cpp)
 add_executable(adc_ads1115_test adc-ads1115-test.cpp)
 add_executable(hysteresis_hw_test hysteresis_hw_test.cpp)
+add_executable(hysteresis_hw_test_subprocess hysteresis_hw_test_subprocess.cpp)
 add_executable(input-edge-event-test input-edge-event-test.cpp)
 
 target_link_libraries(
@@ -115,6 +116,14 @@ target_link_libraries(
 
 target_link_libraries(
   hysteresis_hw_test
+
+  PRIVATE
+
+  statemachine
+)
+
+target_link_libraries(
+  hysteresis_hw_test_subprocess
 
   PRIVATE
 
