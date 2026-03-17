@@ -11,8 +11,8 @@
 
 
 //Konstruktor
-MotorStepper::MotorStepper(const std::string& gpiodevice, OutputSwitch& line_enable, OutputSwitch& line_direction, std::string period_nanosec, std::string duty_nanosec)
-    : _line_enable(line_enable), _line_direction(line_direction), _direction(Direction::IDLE), _period_nanosec(period_nanosec), _duty_nanosec(duty_nanosec){
+MotorStepper::MotorStepper()
+    : _line_enable(24), _line_direction(17), _direction(Direction::IDLE), _period_nanosec("1000000"), _duty_nanosec("500000"){
     
     //MotorStepper::ensureExported();
     MotorStepper::stop();
