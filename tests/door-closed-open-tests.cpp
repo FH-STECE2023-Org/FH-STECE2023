@@ -16,8 +16,8 @@ TEST(door_opening_suite, door_opening_button_outside_pressed)
     events.analog_state = AnalogSensorEvent::NORMAL_VALUE;
     events.button_outside_pressed = EdgeDetector::RISING;
     events.button_inside_pressed = EdgeDetector::NONE;
-    events.light_barrier_closed = EdgeDetector::NONE;
-    events.light_barrier_open = EdgeDetector::NONE;
+    events.sensor_closed = EdgeDetector::NONE;
+    events.sensor_open = EdgeDetector::NONE;
 
     // create output struct
     output_t output;
@@ -52,8 +52,8 @@ TEST(door_opening_suite, door_opening_button_inside_pressed)
     events.analog_state = AnalogSensorEvent::NORMAL_VALUE;
     events.button_outside_pressed = EdgeDetector::NONE;
     events.button_inside_pressed = EdgeDetector::RISING;
-    events.light_barrier_closed = EdgeDetector::NONE;
-    events.light_barrier_open = EdgeDetector::NONE;
+    events.sensor_closed = EdgeDetector::NONE;
+    events.sensor_open = EdgeDetector::NONE;
 
     // create output struct
     output_t output;
@@ -88,8 +88,8 @@ TEST(door_opening_suite, door_open_reached)
     events.analog_state = AnalogSensorEvent::NORMAL_VALUE;
     events.button_inside_pressed = EdgeDetector::NONE;
     events.button_outside_pressed = EdgeDetector::NONE;
-    events.light_barrier_closed = EdgeDetector::NONE;
-    events.light_barrier_open = EdgeDetector::FALLING;
+    events.sensor_closed = EdgeDetector::NONE;
+    events.sensor_open = EdgeDetector::FALLING;
 
     // create output struct
     output_t output;
@@ -125,8 +125,8 @@ TEST(door_opening_error_suite, door_opening_gumminudel_broken)
     events.analog_state = AnalogSensorEvent::UNDER_VALUE;
     events.button_inside_pressed = EdgeDetector::NONE;
     events.button_outside_pressed = EdgeDetector::NONE;
-    events.light_barrier_closed = EdgeDetector::NONE;
-    events.light_barrier_open = EdgeDetector::NONE;
+    events.sensor_closed = EdgeDetector::NONE;
+    events.sensor_open = EdgeDetector::NONE;
 
     // create output struct
     output_t output;
@@ -158,8 +158,8 @@ TEST(door_opening_error_suite, door_open_gumminudel_broken)
     events.analog_state = AnalogSensorEvent::UNDER_VALUE;
     events.button_inside_pressed = EdgeDetector::NONE;
     events.button_outside_pressed = EdgeDetector::NONE;
-    events.light_barrier_closed = EdgeDetector::NONE;
-    events.light_barrier_open = EdgeDetector::NONE;
+    events.sensor_closed = EdgeDetector::NONE;
+    events.sensor_open = EdgeDetector::NONE;
 
     // create output struct
     output_t output;

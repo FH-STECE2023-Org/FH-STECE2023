@@ -106,8 +106,8 @@ int main(int argc, char** argv)
 
     InputSwitch* button_outside;
     InputSwitch* button_inside;
-    InputSwitch* lightbarrier_closed;
-    InputSwitch* lightbarrier_open;
+    InputSwitch* sensor_closed;
+    InputSwitch* sensor_open;
     AnalogSensor* pressureSensor;
     Motor* motor;
 
@@ -119,9 +119,9 @@ int main(int argc, char** argv)
         // Buttons
         button_outside = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
         button_inside = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
-        // Lightbarriers
-        lightbarrier_closed = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
-        lightbarrier_open = new InputSwitchMock(InputSwitch::State::INPUT_HIGH);
+        // Sensors
+        sensor_closed = new InputSwitchMock(InputSwitch::State::INPUT_LOW);
+        sensor_open = new InputSwitchMock(InputSwitch::State::INPUT_HIGH);
         // Pressure sensor
         pressureSensor = new AnalogSensorMock();
         // Motor
@@ -133,8 +133,8 @@ int main(int argc, char** argv)
         // create sensors
         button_outside = new InputSwitchGPIOSysfs(17);
         button_inside = new InputSwitchGPIOSysfs(27);
-        lightbarrier_closed  = new InputSwitchGPIOSysfs(22);
-        lightbarrier_open  = new InputSwitchGPIOSysfs(23);
+        sensor_closed  = new InputSwitchGPIOSysfs(22);
+        sensor_open  = new InputSwitchGPIOSysfs(23);
 
         // Pressure Sensor
         I2CReal* i2c = new I2CReal("/dev/i2c-1", 0x76);
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 
     TimeSpec time;
 
-    Inputs inputs(button_outside, button_inside, lightbarrier_closed, lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs(button_outside, button_inside, sensor_closed, sensor_open, &pressureSensorEG, time);
     Outputs outputs(motor);
 
     input_t in;
@@ -200,8 +200,8 @@ int main(int argc, char** argv)
     // cleanup before exit
     delete button_outside;
     delete button_inside;
-    delete lightbarrier_closed;
-    delete lightbarrier_open;
+    delete sensor_closed;
+    delete sensor_open;
     delete pressureSensor;
     delete motor;
 

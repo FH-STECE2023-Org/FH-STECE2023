@@ -8,7 +8,7 @@
 class Inputs
 {
 public:
-    Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* light_barrier_closed, InputSwitch* light_barrier_open, AnalogSensorEventGenerator* Analogsensor, const TimeSpec& debounce_time);
+    Inputs(InputSwitch* button_outside, InputSwitch* button_inside, InputSwitch* sensor_closed, InputSwitch* sensor_open, AnalogSensorEventGenerator* Analogsensor, const TimeSpec& debounce_time);
     ~Inputs();
 
     // void check(const Events& events);
@@ -19,12 +19,12 @@ public:
 private:
     InputSwitch* _button_outside;
     InputSwitch* _button_inside;
-    InputSwitch* _lightbarrier_closed;
-    InputSwitch* _lightbarrier_open;
+    InputSwitch* _sensor_closed;
+    InputSwitch* _sensor_open;
     AnalogSensorEventGenerator* _Analogsensor;
 
     EdgeDetector *_edge_button_outside;
     EdgeDetector *_edge_button_inside;
-    EdgeDetector *_edge_lightbarrier_closed;
-    EdgeDetector *_edge_lightbarrier_open;
+    EdgeDetector *_edge_sensor_closed;
+    EdgeDetector *_edge_sensor_open;
 };

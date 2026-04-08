@@ -3,9 +3,9 @@
 [*] --> INIT
 INIT --> CLOSED : door in closed position
 CLOSED --> OPENING : button_outside/inside pressed
-OPENING --> OPEN : lightbarrier_open reached
+OPENING --> OPEN : sensor_open reached
 OPEN --> CLOSING : timeout
-CLOSING --> CLOSED : lightbarrier_closed reached
+CLOSING --> CLOSED : sensor_closed reached
 CLOSING --> OPENING : button_outside/inside pressed
 CLOSING --> OPENING : Kindskopf
 

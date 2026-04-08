@@ -64,7 +64,7 @@ output_t Door::cyclic(const events_t events)
                 _state = State::ERROR_SOMETHING_BADLY_WRONG;
             }
 
-            if (events.light_barrier_open == EdgeDetector::FALLING)
+            if (events.sensor_open == EdgeDetector::FALLING)
             {
                 _state = State::OPENED;
             }
@@ -102,7 +102,7 @@ output_t Door::cyclic(const events_t events)
                 _state = State::ERROR_SOMETHING_BADLY_WRONG;
             }
 
-            if (events.light_barrier_closed == EdgeDetector::FALLING)
+            if (events.sensor_closed == EdgeDetector::FALLING)
             {
                 _state = State::CLOSED;
             }           

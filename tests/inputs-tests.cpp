@@ -17,15 +17,15 @@ TEST(input_suite, input_init)
     
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
     
     AnalogSensorMock pressureSensor;
     AnalogSensorEventGenerator pressureSensorEG(&pressureSensor);
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     input_t inputs;
     events_t events;
@@ -46,15 +46,15 @@ TEST(input_suite, input_switch)
     
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
 
     AnalogSensorMock pressureSensor;
     AnalogSensorEventGenerator pressureSensorEG(&pressureSensor);
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     input_t inputs;
     events_t events;
@@ -72,8 +72,8 @@ TEST(input_suite, input_switch)
     
     button_outside.set_state(InputSwitch::State::INPUT_HIGH);
     button_inside.set_state(InputSwitch::State::INPUT_LOW);
-    lightbarrier_closed.set_state(InputSwitch::State::INPUT_HIGH);
-    lightbarrier_open.set_state(InputSwitch::State::INPUT_LOW);
+    sensor_closed.set_state(InputSwitch::State::INPUT_HIGH);
+    sensor_open.set_state(InputSwitch::State::INPUT_LOW);
 
     inputs = inputs_set.get_inputs();
 
@@ -90,15 +90,15 @@ TEST(input_suite, event_init)
     
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
 
     AnalogSensorMock pressureSensor;
     AnalogSensorEventGenerator pressureSensorEG(&pressureSensor);
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     input_t inputs;
     events_t events;
@@ -110,8 +110,8 @@ TEST(input_suite, event_init)
     // check state and output
     ASSERT_EQ(events.button_inside_pressed, EdgeDetector::NONE);
     ASSERT_EQ(events.button_outside_pressed, EdgeDetector::NONE);
-    ASSERT_EQ(events.light_barrier_closed, EdgeDetector::NONE);
-    ASSERT_EQ(events.light_barrier_open, EdgeDetector::NONE);
+    ASSERT_EQ(events.sensor_closed, EdgeDetector::NONE);
+    ASSERT_EQ(events.sensor_open, EdgeDetector::NONE);
 }
 
 TEST(input_suite, event_switch)
@@ -119,15 +119,15 @@ TEST(input_suite, event_switch)
     
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);  // <-- door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // <-- door not in "opened" position
 
     AnalogSensorMock pressureSensor;
     AnalogSensorEventGenerator pressureSensorEG(&pressureSensor);
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     input_t inputs;
     events_t events;
@@ -142,22 +142,22 @@ TEST(input_suite, event_switch)
 
     button_outside.set_state(InputSwitch::State::INPUT_HIGH);
     button_inside.set_state(InputSwitch::State::INPUT_HIGH);
-    lightbarrier_closed.set_state(InputSwitch::State::INPUT_HIGH);
-    lightbarrier_open.set_state(InputSwitch::State::INPUT_LOW);
+    sensor_closed.set_state(InputSwitch::State::INPUT_HIGH);
+    sensor_open.set_state(InputSwitch::State::INPUT_LOW);
 
     events = inputs_set.get_events();
 
     ASSERT_EQ(events.button_inside_pressed, EdgeDetector::RISING);
     ASSERT_EQ(events.button_outside_pressed, EdgeDetector::RISING);
-    ASSERT_EQ(events.light_barrier_closed, EdgeDetector::RISING);
-    ASSERT_EQ(events.light_barrier_open, EdgeDetector::FALLING);
+    ASSERT_EQ(events.sensor_closed, EdgeDetector::RISING);
+    ASSERT_EQ(events.sensor_open, EdgeDetector::FALLING);
 
     events = inputs_set.get_events();
 
     ASSERT_EQ(events.button_inside_pressed, EdgeDetector::NONE);
     ASSERT_EQ(events.button_outside_pressed, EdgeDetector::NONE);
-    ASSERT_EQ(events.light_barrier_closed, EdgeDetector::NONE);
-    ASSERT_EQ(events.light_barrier_open, EdgeDetector::NONE);
+    ASSERT_EQ(events.sensor_closed, EdgeDetector::NONE);
+    ASSERT_EQ(events.sensor_open, EdgeDetector::NONE);
 
 }
 
@@ -169,14 +169,14 @@ TEST(input_suite, Pressure_sensor_init)
     
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
     AnalogSensorMock pressureSensor;
     AnalogSensorEventGenerator pressureSensorEG(&pressureSensor);
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     input_t inputs;
     events_t events;
@@ -205,8 +205,8 @@ TEST(input_suite, Pressure_sensor_event_generator_test)
 {
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
     AnalogSensorMock pressureSensor;
 
     // set values for over- and under-pressure
@@ -214,7 +214,7 @@ TEST(input_suite, Pressure_sensor_event_generator_test)
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     events_t events;
 
@@ -242,8 +242,8 @@ TEST(input_suite, Pressure_sensor_event_generator_hysteresis_test)
 {
     InputSwitchMock button_outside(InputSwitch::State::INPUT_LOW);
     InputSwitchMock button_inside(InputSwitch::State::INPUT_LOW);
-    InputSwitchMock lightbarrier_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
-    InputSwitchMock lightbarrier_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
+    InputSwitchMock sensor_closed(InputSwitch::State::INPUT_LOW);    // door in "closed" position
+    InputSwitchMock sensor_open(InputSwitch::State::INPUT_HIGH);   // door not in "opened" position
     AnalogSensorMock pressureSensor;
 
     // thresholds
@@ -255,7 +255,7 @@ TEST(input_suite, Pressure_sensor_event_generator_hysteresis_test)
 
     // create Input struct
     TimeSpec time;
-    Inputs inputs_set(&button_outside, &button_inside, &lightbarrier_closed, &lightbarrier_open, &pressureSensorEG, time);
+    Inputs inputs_set(&button_outside, &button_inside, &sensor_closed, &sensor_open, &pressureSensorEG, time);
 
     events_t events;
   
